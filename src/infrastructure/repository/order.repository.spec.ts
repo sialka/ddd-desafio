@@ -13,7 +13,6 @@ import OrderRepository from "./order.repository";
 import OrderModel from "../db/sequelize/model/order.model";
 
 describe("Order repository test", () => {
-
     let sequileze: Sequelize;
 
     beforeEach(async () => {
@@ -139,9 +138,7 @@ describe("Order repository test", () => {
         const result = await OrderModel.findOne({
             where: { id: order.id },
             include: ["items"],
-        });
-
-        console.log(result);
+        });        
         
         expect(result.toJSON()).toStrictEqual({
             id: "123",
