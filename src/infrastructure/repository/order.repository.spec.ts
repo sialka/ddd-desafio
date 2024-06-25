@@ -35,8 +35,7 @@ describe("Order repository test", () => {
     afterEach(async () => {
         await sequileze.close();
     });      
-    
-    /*
+        
     it("should create a new order", async () => {
 
         const customerRepository = new CustomerRepository();
@@ -84,8 +83,7 @@ describe("Order repository test", () => {
         });
 
     });
-    */
-
+    
     it("should update a new order", async () => {
 
         // Customer
@@ -110,55 +108,83 @@ describe("Order repository test", () => {
         );
 
         // Order
-        const order = new Order("123", "123", [orderItem]);                
+        let order = new Order("123", "123", [orderItem]);    
+
         const orderRepository = new OrderRepository();
         await orderRepository.create(order);                
 
-        // Find
-        const orderModel = await OrderModel.findOne({
+        // 1st Test
+        let orderModel = await OrderModel.findOne({
             where: { id: order.id },
             include: ["items"],
-        });               
-
-        // Update
-
-        const product2 = new Product("456", "Product 2", 20);                
-        const orderItemUpdate = new OrderItem(
-            "1",
-            product2.name,
-            product2.price,
-            product2.id,
-            2
-        );
+        });
         
-        order.changeItems([orderItemUpdate]);                 
-        await orderRepository.update(order);
-        
-        // Find
-        const result = await OrderModel.findOne({
-            where: { id: order.id },
-            include: ["items"],
-        });        
-        
-        expect(result.toJSON()).toStrictEqual({
+        expect(orderModel.toJSON()).toStrictEqual({
             id: "123",
             customer_id: "123",
             items: [
                 {
-                    id: "1",                    
+                    id: orderItem.id,
+                    name: orderItem.name,
+                    price: orderItem.price,
+                    quantity: orderItem.quantity,
                     order_id: "123",
-                    name: 'Product 1',
                     product_id: "123",
-                    price: 10,
-                    quantity: 2
-                }
-            ],                      
-            total: 40,
-        })
+                },
+            ],      
+            total: 20,                            
+        })        
 
-    });
+
+        // Update
+
+        const product2 = new Product("456", "Product 2", 20);   
+        await productRepository.create(product2);
+
+        const orderItem2 = new OrderItem(
+            "2",
+            product2.name,
+            product2.price,
+            product2.id,
+            1
+        );
+        order = new Order("123", "123", [orderItem,orderItem2]);
+                
+        await orderRepository.update(order);
+
+        orderModel = await OrderModel.findOne({
+            where: { id: order.id },
+            include: ["items"],
+        });    
+
+        // 2st Test
+        
+        expect(orderModel.toJSON()).toStrictEqual({
+            id: "123",
+            customer_id: "123",
+            total: order.total(),
+            items: [
+              {
+                id: orderItem.id,
+                name: orderItem.name,
+                price: orderItem.price,
+                quantity: orderItem.quantity,
+                order_id: "123",
+                product_id: "123",
+              },
+              {
+                id: orderItem2.id,
+                name: orderItem2.name,
+                price: orderItem2.price,
+                quantity: orderItem2.quantity,
+                order_id: "123",
+                product_id: "456",
+              }
+            ],            
+          });
+
+    });    
     
-    /*
     it("should find a order", async () => {
 
         // Customer
@@ -240,9 +266,7 @@ describe("Order repository test", () => {
         await orderRepository.create(order2);
 
         // Find
-        const orders = await orderRepository.findAll();
-
-        console.log(orders)
+        const orders = await orderRepository.findAll();        
         
         expect(orders).toHaveLength(2);
         expect(orders).toContainEqual(order1);
@@ -250,5 +274,5 @@ describe("Order repository test", () => {
 
 
     });
-    */
+    
 });
