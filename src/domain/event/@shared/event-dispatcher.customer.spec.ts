@@ -81,15 +81,15 @@ describe("Domain events test", () => {
         const eventHandler = new SendMsgWhenChangeAddressIsUpdatedHandler();
         
         const spyEventHandler = jest.spyOn(eventHandler, "handle");       
-        eventDispatcher.register("CustomerCreatedEvent", eventHandler);        
+        eventDispatcher.register("CustomerChangeAddressEvent", eventHandler);        
         
-        expect(eventDispatcher.getEventHandlers["CustomerCreatedEvent"][0]).toMatchObject(eventHandler);                              
+        expect(eventDispatcher.getEventHandlers["CustomerChangeAddressEvent"][0]).toMatchObject(eventHandler);                              
         
         const address = new Address("Rua Dois",1,"01212-001","SP");        
         const customer = new Customer("1", "Pedro");
         customer.changeAddress(address)
 
-        const customerChangeAddressEvent = new CustomerCreatedEvent({
+        const customerChangeAddressEvent = new CustomerChangeAddressEvent({
             customer: customer            
         });    
 
